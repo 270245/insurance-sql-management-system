@@ -17,3 +17,25 @@ INSERT INTO Payments (PolicyID, PaymentDate, Amount, PaymentMethod)
 VALUES
 (1, '2025-01-05', 500.00, 'Credit Card'),
 (2, '2025-02-05', 800.00, 'Bank Transfer');
+
+-- High-value claims (fraud detection idea)
+SELECT *
+FROM Claims
+WHERE ClaimAmount > 2000;
+
+-- Claim approval rate
+SELECT 
+    COUNT(CASE WHEN ClaimStatus = 'Approved' THEN 1 END) * 100.0 / COUNT(*) AS ApprovalRate
+FROM Claims;
+
+-- Customer risk profile
+SELECT 
+    c.FirstName,
+    c.LastName,
+    COUNT(cl.ClaimID) AS TotalClaims,
+    SUM(cl.ClaimAmount) AS TotalClaimAmount
+FROM Customers c
+JOIN Policies p ON c.CustomerID = p.CustomerID
+JOIN Claims cl ON p.PolicyID = cl.PolicyID
+GROUP BY c.FirstName, c.LastName
+ORDER BY TotalClaimAmount DESC;
